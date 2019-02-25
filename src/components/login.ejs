@@ -1,0 +1,28 @@
+<html>
+<form action="/login" method="post">
+  <div>
+    Cleveland State University - Enrollment Project
+    <br />
+    <br />
+  </div>
+    <div style="padding:10px">
+        <label>CSU ID:</label>
+        <input type="text" name="username"/>
+    </div>
+    <div style="padding:10px">
+        <label>Password:</label>
+        <input type="password" name="password"/>
+    </div>
+    <br />
+    <div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+</form>
+<hr>
+<% Object.keys(flash).forEach(function(type) { %>
+  <% flash[type].forEach(function(str) { %>
+    <%- type %>: <%- str %>
+  <% }); %>
+<% }); %>
+
+</html>
