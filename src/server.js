@@ -37,7 +37,11 @@ passport.use(new Strategy(
   function(username, password, done) {
     if (username == 'admin' && password == 'admin') {
 			return done(null, {'id': 'admin', 'password' : 'admin'});
-		} else {
+		}
+		else if (username == 'student' && password == 'student') {
+			return done(null, {'id': 'student', 'password' : 'student'});
+		}
+		 else {
 			return done(null, false);
 		}
   }
@@ -50,6 +54,8 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(id, done) {
 	if(id == 'admin') {
 		done(null, {'id': 'admin', 'password' : 'admin'});
+	} else if (id == 'student') {
+		done(null, {'id': 'student', 'password' : 'student'});
 	}
 });
 
@@ -66,10 +72,18 @@ app.all('/api/*', (req,res,next) => {
   } else {
     console.log(new Date() + ` not yet authenticated for: ${req.path}`);
     passport.authenticate('local', function(err, user) {
-      req.login({ id: 'admin', password: 'admin' },{ session: false }, function(err) {
-          if(err) {return next(err)}
-          next()
-      })
+			if (req.user.id == 'admin') {
+				req.login({ id: 'admin', password: 'admin' },{ session: false }, function(err) {
+						if(err) {return next(err)}
+						next()
+				})
+			} else {
+				req.login({ id: 'student', password: 'student' },{ session: false }, function(err) {
+						if(err) {return next(err)}
+						next()
+				})
+			}
+
     })(req, res, next)
   }
 });
@@ -84,17 +98,18 @@ app.get('/login', (req,res) => {
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
   function(req, res) {
-		console.log("Redirecting");
-    res.redirect('/');
+		if(req.user.id == 'admin') {
+			res.redirect('view_projects');
+		} else if (req.user.id == 'student') {
+			res.redirect('select_projects')
+		}
   });
 
 
-app.get('/logout',
-  function(req, res){
-    req.logout();
-    res.redirect('/');
-  }
-);
+app.get('/logout', (req,res) => {
+	  req.logout();
+	  res.redirect('/');
+});
 
 
 // main route, handle sapper stuff after checking authentication.

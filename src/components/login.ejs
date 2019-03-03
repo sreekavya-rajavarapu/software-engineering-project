@@ -1,28 +1,35 @@
 <html>
-<form action="/login" method="post">
-  <div>
-    Cleveland State University - Enrollment Project
-    <br />
-    <br />
-  </div>
-    <div style="padding:10px">
-        <label>CSU ID:</label>
-        <input type="text" name="username"/>
-    </div>
-    <div style="padding:10px">
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
-    <br />
-    <div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </div>
-</form>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div style="margin: 0 auto; width:50%">
+  <form action="/login" method="post">
+
+        <div style="width:10%; margin:0 auto;">
+          <img width="100px" height="100px" src="https://www.csuohio.edu/sites/default/files/media/marketing/images/seal.jpg" id="icon" alt="User Icon" />
+        </div>
+
+        <!-- Login Form -->
+
+        <div style="width:20%; margin:0 auto; margin-top:20px; margin-bottom:20px">
+            <label>CSU ID:</label>
+            <input type="text" name="username"/>
+        </div>
+        <div style="width:20%; margin:0 auto; margin-top:20px; margin-bottom:20px">
+            <label>Password:</label>
+            <input type="password" name="password"/>
+        </div>
+        <br />
+        <div style="width:8%; margin:0 auto; margin-top:20px; margin-bottom:20px">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+  </form>
 <hr>
 <% Object.keys(flash).forEach(function(type) { %>
   <% flash[type].forEach(function(str) { %>
     <%- type %>: <%- str %>
   <% }); %>
 <% }); %>
-
+</div>
 </html>
