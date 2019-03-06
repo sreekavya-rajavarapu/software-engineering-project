@@ -94,6 +94,11 @@ app.get('/login', (req,res) => {
 	res.render(path.join(process.cwd(), 'src', 'components','login.ejs'),{flash: flashMsg});
 });
 
+app.get('/new_user', (req,res) => {
+	let flashMsg = req.flash();
+	res.render(path.join(process.cwd(), 'src', 'components','new_user.ejs'),{flash: flashMsg});
+});
+
 // after passport serializes user object
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),

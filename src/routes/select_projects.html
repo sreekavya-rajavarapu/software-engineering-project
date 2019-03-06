@@ -2,4 +2,98 @@
 	<title>Select Projects</title>
 </svelte:head>
 
-<h1>Students can select project here</h1>
+<h4> Enter the project details you want to add </h4>
+<br />
+
+
+<table id="projects_table" class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Project title</th>
+      <th scope="col">Supervisor</th>
+			<th scope="col">Project description</th>
+      <th scope="col">Total available</th>
+			<th scope="col">Add project? </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Test ABC</td>
+      <td>xyz</td>
+			<td> Describe project in few lines </td>
+      <td>5</td>
+			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Test ABC</td>
+      <td>xyz</td>
+			<td> Describe project in few lines </td>
+      <td>0</td>
+			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Test ABC</td>
+      <td>xyz</td>
+			<td> Describe project in few lines </td>
+      <td>1</td>
+			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
+    </tr>
+  </tbody>
+</table>
+
+<style>
+	h1, figure, p {
+		text-align: center;
+		margin: 0 auto;
+	}
+
+	h1 {
+		font-size: 2.8em;
+		text-transform: uppercase;
+		font-weight: 700;
+		margin: 0 0 0.5em 0;
+	}
+
+	figure {
+		margin: 0 0 1em 0;
+	}
+
+	img {
+		width: 100%;
+		max-width: 400px;
+		margin: 0 0 1em 0;
+	}
+
+	p {
+		margin: 1em auto;
+	}
+
+	@media (min-width: 480px) {
+		h1 {
+			font-size: 4em;
+		}
+	}
+</style>
+
+<script>
+	import 'datatables.net';
+
+	export default {
+		oncreate () {
+			$('#projects_table').DataTable({
+					"paginate" : true,
+					"autoWidth": false ,
+					"bLengthChange": false,
+					"pagingType": "full_numbers"
+			})
+		},
+		ondestroy() {
+			var oTable = $('#projects_table').dataTable();
+			oTable.fnDestroy();
+		}
+	}
+</script>

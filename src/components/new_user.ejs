@@ -1,0 +1,60 @@
+<html>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<div style="margin: 0 auto; width:50%">
+  <form action="/login" method="post">
+
+        <div style="width:10%; margin:0 auto;">
+          <img width="100px" height="100px" src="https://www.csuohio.edu/sites/default/files/media/marketing/images/seal.jpg" id="icon" alt="User Icon" />
+        </div>
+				<br />
+				<div style="width:25%; margin:0 auto;" class="control-group">
+				<!-- Username -->
+				<label class="control-label"  for="username">Username</label>
+				<div class="controls">
+					<input type="text" id="username" name="username" placeholder="" class="input-xlarge">
+				</div>
+			</div>
+				<br />
+			<div style="width:25%; margin:0 auto;" class="control-group">
+				<!-- E-mail -->
+				<label class="control-label" for="email">E-mail</label>
+				<div class="controls">
+					<input type="text" id="email" name="email" placeholder="" class="input-xlarge">
+					<p class="help-block">Please provide your CUS E-mail ID</p>
+				</div>
+			</div>
+			<br />
+			<div style="width:25%; margin:0 auto;" class="control-group">
+				<!-- Password-->
+				<label class="control-label" for="password">Password</label>
+				<div class="controls">
+					<input type="password" id="password" name="password" placeholder="" class="input-xlarge">
+				</div>
+			</div>
+			<br />
+			<div style="width:25%; margin:0 auto;" class="control-group">
+				<!-- Password -->
+				<label class="control-label"  for="password_confirm">Password (Confirm)</label>
+				<div class="controls">
+					<input type="password" id="password_confirm" name="password_confirm" placeholder="" class="input-xlarge">
+				</div>
+			</div>
+			<br />
+			<div style="width:15%; margin:0 auto;" class="control-group">
+				<!-- Button -->
+				<div class="controls">
+					<button class="btn btn-success">Register</button>
+				</div>
+			</div>
+		  </form>
+<hr>
+<% Object.keys(flash).forEach(function(type) { %>
+  <% flash[type].forEach(function(str) { %>
+    <%- type %>: <%- str %>
+  <% }); %>
+<% }); %>
+</div>
+</html>
