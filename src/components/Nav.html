@@ -61,10 +61,10 @@
 	const fetchOpts = {headers: {}, credentials: 'include'};
 	export default {
 		oncreate() {
-			fetch(`/api/getUserLevel`,fetchOpts)
+			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
 			.then(r => r.json())
 			.then(levelInfo => {
-				this.set({'userlevel': levelInfo.level})
+				this.set({'userlevel': levelInfo.type})
 			})
 		}
 	}

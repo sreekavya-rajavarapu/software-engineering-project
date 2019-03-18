@@ -16,7 +16,7 @@ const ejs = require('ejs')
 var session = require('express-session');
 // file store for SESSIONS
 var MemoryStore = require('session-memory-store')(session);
-
+var db = require('./_sequelize/config/db.js');
 
 app.use(
 	session({
@@ -35,15 +35,16 @@ app.engine('.ejs', ejs.renderFile);
 
 passport.use(new Strategy(
   function(username, password, done) {
-    if (username == 'admin' && password == 'admin') {
-			return done(null, {'id': 'admin', 'password' : 'admin'});
-		}
-		else if (username == 'student' && password == 'student') {
-			return done(null, {'id': 'student', 'password' : 'student'});
-		}
-		 else {
-			return done(null, false);
-		}
+		db.User.findOne({ where: {csuid: username}}).then((user) => {
+			if (user) {
+				if (user.password == password) {
+					return done(null, {'id': username, 'password' : password, 'type': user.user_type});
+				}
+			} else {
+				alert("Invalid user name / password");
+				return done(null, false);
+			}
+		})
   }
 ));
 
@@ -52,28 +53,40 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-	if(id == 'admin') {
-		done(null, {'id': 'admin', 'password' : 'admin'});
-	} else if (id == 'student') {
-		done(null, {'id': 'student', 'password' : 'student'});
-	}
+	db.User.findOne({ where: {csuid: id}}).then((user) => {
+		done(null, {'id': user.id, 'password' : user.password, 'type': user.user_type });
+	})
 });
 
 app.use(bodyParser.json({limit: '50mb'}))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(fileUpload());
 
+app.all('/', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+ });
 
+
+app.post('/api/addNewUser', (req, res,next) => {
+	passport.authenticate('local', function(err, user) {
+		req.login({ id: 'admin', password: 'admin' },{ session: false }, function(err) {
+				if(err) {return next(err)}
+				next()
+		})
+	})(req, res, next)
+});
 
 // intercept Basic auth in case the api is being used without client cookies.
-app.all('/api/*', (req,res,next) => {
+app.all('/api/auth_req/*', (req,res,next) => {
 	if(req.isAuthenticated()){
     next();
   } else {
     console.log(new Date() + ` not yet authenticated for: ${req.path}`);
     passport.authenticate('local', function(err, user) {
-			if (req.user.id == 'admin') {
-				req.login({ id: 'admin', password: 'admin' },{ session: false }, function(err) {
+			if (req.user.id == '1234') {
+				req.login({ id: '1234', password: '1234' },{ session: false }, function(err) {
 						if(err) {return next(err)}
 						next()
 				})
@@ -83,7 +96,6 @@ app.all('/api/*', (req,res,next) => {
 						next()
 				})
 			}
-
     })(req, res, next)
   }
 });
@@ -103,10 +115,10 @@ app.get('/new_user', (req,res) => {
 app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
   function(req, res) {
-		if(req.user.id == 'admin') {
-			res.redirect('view_projects');
-		} else if (req.user.id == 'student') {
-			res.redirect('select_projects')
+		if(req.user.type == 'student') {
+			res.redirect('select_projects');
+		} else if (req.user.type == 'admin') {
+			res.redirect('view_projects')
 		}
   });
 
