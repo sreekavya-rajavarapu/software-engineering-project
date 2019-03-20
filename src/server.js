@@ -54,7 +54,7 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(id, done) {
 	db.User.findOne({ where: {csuid: id}}).then((user) => {
-		done(null, {'id': user.id, 'password' : user.password, 'type': user.user_type });
+		done(null, {'id': user.csuid, 'password' : user.password, 'type': user.user_type });
 	})
 });
 
@@ -85,17 +85,12 @@ app.all('/api/auth_req/*', (req,res,next) => {
   } else {
     console.log(new Date() + ` not yet authenticated for: ${req.path}`);
     passport.authenticate('local', function(err, user) {
-			if (req.user.id == '1234') {
-				req.login({ id: '1234', password: '1234' },{ session: false }, function(err) {
+			db.User.findOne({ where: {csuid: username}}).then((user) => {
+				req.login({ id: user.csuid, password: user.password },{ session: false }, function(err) {
 						if(err) {return next(err)}
 						next()
 				})
-			} else {
-				req.login({ id: 'student', password: 'student' },{ session: false }, function(err) {
-						if(err) {return next(err)}
-						next()
-				})
-			}
+			})
     })(req, res, next)
   }
 });

@@ -2,6 +2,7 @@
 	<title>Select Projects</title>
 </svelte:head>
 
+<p style="color:grey"> Logged in as {userid} </p>
 <h4> Select Projects </h4>
 <br />
 
@@ -81,7 +82,7 @@
 
 <script>
 	import 'datatables.net';
-
+	const fetchOpts = {headers: {}, credentials: 'include'};
 	export default {
 		oncreate () {
 			$('#projects_table').DataTable({
@@ -90,6 +91,14 @@
 					"bLengthChange": false,
 					"pagingType": "full_numbers"
 			})
+
+			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
+			.then(r => r.json())
+			.then(userDetails => {
+				console.log(userDetails);
+				this.set({'userid': userDetails.csuid})
+			})
+
 		},
 		ondestroy() {
 			var oTable = $('#projects_table').dataTable();

@@ -2,4 +2,37 @@
 	<title>My Profile</title>
 </svelte:head>
 
-<h1>Students Profile displayed here</h1>
+<h2 style="color:grey"> Profile Details </h2>
+<br />
+<hr />
+<p> CSU ID : {userDetails.csuid} </p>
+<p> First Name : {userDetails.fname} </p>
+<p> Last Name : {userDetails.lname} </p>
+
+<p> Major 1 : {userDetails.major_1} </p>
+
+<p> Major 2 : {userDetails.major_2} </p>
+
+
+<script>
+	import 'datatables.net';
+	const fetchOpts = {headers: {}, credentials: 'include'};
+	export default {
+		data() {
+			return{
+				userDetails: {}
+			}
+		},
+		oncreate () {
+
+
+			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
+			.then(r => r.json())
+			.then(userDetails => {
+				console.log(userDetails);
+				this.set({'userDetails': userDetails})
+			})
+
+		}
+	}
+</script>
