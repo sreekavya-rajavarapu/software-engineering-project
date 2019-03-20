@@ -41,7 +41,7 @@ passport.use(new Strategy(
 					return done(null, {'id': username, 'password' : password, 'type': user.user_type});
 				}
 			} else {
-				alert("Invalid user name / password");
+				console.log("Invalid user name / password");
 				return done(null, false);
 			}
 		})
