@@ -5,35 +5,21 @@
 <table id="projects_table" class="table">
   <thead class="thead-dark">
     <tr>
-      <th scope="col">#</th>
       <th scope="col">Project title</th>
-      <th scope="col">Supervisor</th>
 			<th scope="col">Project description</th>
-      <th scope="col">Total available</th>
+			<th scope="col"> Total Enrolled </th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>1</td>
-    </tr>
+		{#if projectList.length > 0}
+			{#each projectList as project}
+		    <tr>
+		      <td>{project.title}</td>
+					<td>{project.description}</td>
+					<td> 0 </td>
+		    </tr>
+			{/each}
+		{/if}
   </tbody>
 </table>
 
@@ -73,14 +59,25 @@
 
 <script>
 	import 'datatables.net';
+	const fetchOpts = {headers: {}, credentials: 'include'};
 
 	export default {
+		data () {
+			return {
+					projectList: []
+			}
+		},
 		oncreate () {
-			$('#projects_table').DataTable({
-					"paginate" : true,
-					"autoWidth": false ,
-					"bLengthChange": false,
-					"pagingType": "full_numbers"
+			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
+			.then(r => r.json())
+			.then(projectDetails => {
+				this.set({projectList: projectDetails});
+				$('#projects_table').DataTable({
+						"paginate" : true,
+						"autoWidth": false ,
+						"bLengthChange": false,
+						"pagingType": "full_numbers"
+				})
 			})
 		},
 		ondestroy() {
