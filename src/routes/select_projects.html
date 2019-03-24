@@ -10,39 +10,21 @@
 <table id="projects_table" class="table">
   <thead class="thead-dark">
     <tr>
-      <th scope="col">#</th>
       <th scope="col">Project title</th>
-      <th scope="col">Supervisor</th>
 			<th scope="col">Project description</th>
-      <th scope="col">Total available</th>
 			<th scope="col">Add project? </th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>5</td>
-			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>0</td>
-			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Test ABC</td>
-      <td>xyz</td>
-			<td> Describe project in few lines </td>
-      <td>1</td>
-			<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
-    </tr>
+		{#if projectList.length > 0}
+			{#each projectList as project}
+		    <tr>
+		      <td>{project.title}</td>
+					<td>{project.description}</td>
+					<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
+		    </tr>
+			{/each}
+		{/if}
   </tbody>
 </table>
 
@@ -84,19 +66,29 @@
 	import 'datatables.net';
 	const fetchOpts = {headers: {}, credentials: 'include'};
 	export default {
+		data () {
+			return {
+					projectList: []
+			}
+		},
 		oncreate () {
-			$('#projects_table').DataTable({
-					"paginate" : true,
-					"autoWidth": false ,
-					"bLengthChange": false,
-					"pagingType": "full_numbers"
-			})
 
 			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
 			.then(r => r.json())
 			.then(userDetails => {
-				console.log(userDetails);
 				this.set({'userid': userDetails.csuid})
+			});
+
+			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
+			.then(r => r.json())
+			.then(projectDetails => {
+				this.set({projectList: projectDetails});
+				$('#projects_table').DataTable({
+						"paginate" : true,
+						"autoWidth": false ,
+						"bLengthChange": false,
+						"pagingType": "full_numbers"
+				})
 			})
 
 		},

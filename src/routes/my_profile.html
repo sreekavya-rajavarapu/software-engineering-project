@@ -25,11 +25,9 @@
 		},
 		oncreate () {
 
-
 			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
 			.then(r => r.json())
-			.then(userDetails => {
-				console.log(userDetails);
+			.then((userDetails) => {
 				this.set({'userDetails': userDetails})
 			})
 

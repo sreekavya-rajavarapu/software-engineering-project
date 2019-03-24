@@ -4,22 +4,47 @@
 
 <h4> Enter the project details you want to add </h4>
 <br />
-<form>
+
   <div class="form-group">
     <label for="exampleFormControlInput1">Project title</label>
-    <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
+    <input type="text" class="form-control" id="project-title" placeholder="">
   </div>
-
-	<div class="form-group">
-		<label for="exampleFormControlInput1">Total Available slots</label>
-		<input type="text" class="form-control" id="exampleFormControlInput1" placeholder="">
-	</div>
-
 
   <div class="form-group">
     <label for="exampleFormControlTextarea1">Project description</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <textarea class="form-control" id="project-description" rows="3"></textarea>
   </div>
 
-	<button type="submit" class="btn btn-primary">Add project</button>
-</form>
+	<button type="submit" on:click="createProject()" class="btn btn-primary">Add project</button>
+
+
+<script>
+const fetchOpts = {headers: {}, credentials: 'include'};
+export default {
+
+	oncreate() {
+
+	},
+	methods: {
+		createProject: function() {
+			// add project to database
+			// TODO: Validation
+			var title = document.getElementById('project-title').value;
+			var description = document.getElementById('project-description').value;
+			let postBody = JSON.stringify({'title': title, 'description' : description});
+
+			fetchOpts.method = 'post';
+			fetchOpts.headers = {'Content-Type': 'application/json'};
+			fetchOpts.body = postBody;
+
+			fetch('/api/auth_req/addNewProject', fetchOpts)
+			.then(res => res.json())
+			.then((status) => {
+				console.log(status);
+				alert("Project created: " + status)
+			})
+		}
+	}
+}
+
+</script>

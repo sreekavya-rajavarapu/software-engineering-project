@@ -8,7 +8,7 @@ export function post(req,res,next) {
   let lname = req.body.lname;
   let password = req.body.password;
   let major_1 = req.body.major_1;
-  let major_2 = req.body.major_1;
+  let major_2 = req.body.major_2;
   db.User.sync().then(() => {
     db.User.findOne({ where: {csuid: csuid}}).then(user => {
       if (user == null) {
