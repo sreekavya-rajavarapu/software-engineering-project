@@ -17,13 +17,30 @@
 
 	<button type="submit" on:click="createProject()" class="btn btn-primary">Add project</button>
 
+<br />
+<br />
+<br />
+
+<h4> Or upload a csv </h4>
+
+<div action="#" class="dropzone dropzone-box" id=upload>
+  <div class="fallback"></div>
+  <div class="dz-message" data-dz-message><span><slot></slot></span></div>
+</div>
 
 <script>
 const fetchOpts = {headers: {}, credentials: 'include'};
+let dzOpts = {
+		url: '/api/imports',
+		timeout: 180000,
+		acceptedFiles: '.csv,.zip'
+	};
 export default {
 
 	oncreate() {
-
+		var DropZone = require('dropzone');
+		require('dropzone/dist/dropzone.css');
+		this.dropZone = new DropZone(`div#upload`, dzOpts);
 	},
 	methods: {
 		createProject: function() {

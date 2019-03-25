@@ -21,7 +21,7 @@
 		    <tr>
 		      <td>{project.title}</td>
 					<td>{project.description}</td>
-					<td><button type="submit" class="btn btn-primary">Add to my projects</button> </td>
+					<td><button style="width:200px; height:50px;" type="submit" class="btn btn-primary">Add to my projects</button> </td>
 		    </tr>
 			{/each}
 		{/if}
@@ -87,7 +87,11 @@
 						"paginate" : true,
 						"autoWidth": false ,
 						"bLengthChange": false,
-						"pagingType": "full_numbers"
+						"pagingType": "full_numbers",
+						"columnDefs": [
+							{ "width": "20%", "targets": 0 },
+							{ "width": "20%", "targets": 2 }
+						]
 				})
 			})
 
