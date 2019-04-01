@@ -14,23 +14,152 @@
 <p> Major 2 : {userDetails.major_2} </p>
 
 
+<br />
+<hr />
+<!-- Show the list of projects this user has enrolled in -->
+<h2 style="color:grey"> Your enrollments </h2>
+
+<table id="projects_table" class="table">
+  <thead class="thead-dark">
+    <tr>
+			<th scope="col"> Project Id </th>
+      <th scope="col">Project title</th>
+			<th scope="col">Project description</th>
+			<th scope="col">Enrolled on</th>
+			<th scope="col"> Delete enrollment </th>
+    </tr>
+  </thead>
+  <tbody>
+		{#if masterProjectList.length > 0}
+			{#each masterProjectList as project}
+		    <tr>
+					<td> {project.project_id} </td>
+		      <td>{project.project_title}</td>
+					<td>{project.project_description}</td>
+					<td>{project.date_of_enrollment}</td>
+					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="deleteEnrollment(project.project_id)"
+						type="submit" class="btn btn-danger">Delete enrollment</button> </td>
+		    </tr>
+			{/each}
+		{/if}
+  </tbody>
+</table>
+
 <script>
 	import 'datatables.net';
-	const fetchOpts = {headers: {}, credentials: 'include'};
+	const _ = require('underscore');
+	let fetchOpts = {headers: {}, credentials: 'include'};
 	export default {
 		data() {
 			return{
+				projectList: [],
+				masterProjectList: [],
 				userDetails: {}
 			}
 		},
 		oncreate () {
-
+			let fetchOpts = {headers: {}, credentials: 'include'};
 			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
 			.then(r => r.json())
 			.then((userDetails) => {
 				this.set({'userDetails': userDetails})
-			})
+				fetch(`/api/auth_req/getAllProjects`, fetchOpts)
+				.then(r => r.json())
+				.then(projectDetails => {
+					this.set({projectList: projectDetails});
 
+					let fetchOpts = {headers: {}, credentials: 'include'};
+					fetchOpts.method = 'get';
+
+					// get all enrollments and rebuild the list of projects to display
+					fetchOpts.headers.user_id = this.get().userDetails.csuid;
+					fetch(`/api/auth_req/getEnrollments`, fetchOpts)
+					.then(r => r.json())
+					.then(enrollments => {
+						let masterProjectList = []
+						// match the enrollments with all projects and only display those projects which user is not enrolled in
+						_.each(this.get().projectList, (project) => {
+							// check if this project is in enrollment
+							let enrollment = _.where(enrollments, {'project_id': project.id})
+
+							if (enrollment.length > 0 ){
+								let temp = {}
+								temp['enrollment_id'] = enrollment[0].id;
+								temp['date_of_enrollment'] = enrollment[0].enrollment_date;
+								temp['project_id'] = project.id;
+								temp['project_title'] = project.title;
+								temp['project_description'] = project.description;
+								masterProjectList.push(temp)
+							}
+						})
+						this.set({masterProjectList: masterProjectList})
+						$('#projects_table').DataTable({
+								"paginate" : true,
+								"autoWidth": false ,
+								"bLengthChange": false,
+								"pagingType": "full_numbers"
+
+						})
+					})
+				})
+			})
+		},
+		methods: {
+			deleteEnrollment: function(project_id) {
+				let fetchOpts = {headers: {}, credentials: 'include'};
+				fetchOpts.method = 'delete';
+				fetchOpts.headers.user_id = this.get().userDetails.csuid;
+				fetchOpts.headers.project_id = project_id;
+				// for this user remove this project from enrollment
+				fetch(`/api/auth_req/deleteEnrollment`, fetchOpts)
+				.then(r => r.json())
+				.then((result) => {
+					alert("Project deleted from your enrollment successfully")
+					this.rebuildMasterProjectList();
+				})
+			},
+
+			rebuildMasterProjectList: function() {
+				var oTable = $('#projects_table').dataTable();
+				oTable.fnDestroy();
+
+				let fetchOpts = {headers: {}, credentials: 'include'};
+				fetchOpts.method = 'get';
+				// get all enrollments and rebuild the list of projects to display
+				fetchOpts.headers.user_id = this.get().userDetails.csuid;
+				fetch(`/api/auth_req/getEnrollments`, fetchOpts)
+				.then(r => r.json())
+				.then(enrollments => {
+					let masterProjectList = []
+					// match the enrollments with all projects and only display those projects which user is not enrolled in
+					_.each(this.get().projectList, (project) => {
+						// check if this project is in enrollment
+						let enrollment = _.where(enrollments, {'project_id': project.id})
+
+						if (enrollment.length > 0 ){
+							let temp = {}
+							temp['enrollment_id'] = enrollment[0].id;
+							temp['date_of_enrollment'] = enrollment[0].enrollment_date;
+							temp['project_id'] = project.id;
+							temp['project_title'] = project.title;
+							temp['project_description'] = project.description;
+							masterProjectList.push(temp)
+						}
+					})
+					this.set({masterProjectList: masterProjectList})
+					$('#projects_table').DataTable({
+							"paginate" : true,
+							"autoWidth": false ,
+							"bLengthChange": false,
+							"pagingType": "full_numbers"
+
+					})
+				})
+			}
+		},
+		ondestroy() {
+			var oTable = $('#projects_table').dataTable();
+			oTable.fnDestroy();
 		}
 	}
 </script>

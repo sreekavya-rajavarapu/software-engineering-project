@@ -5,18 +5,21 @@
 <table id="projects_table" class="table">
   <thead class="thead-dark">
     <tr>
+			<th scope="col">Project ID</th>
       <th scope="col">Project title</th>
 			<th scope="col">Project description</th>
 			<th scope="col"> Total Enrolled </th>
     </tr>
   </thead>
   <tbody>
-		{#if projectList.length > 0}
-			{#each projectList as project}
+		{#if masterProjectList.length > 0}
+			{#each masterProjectList as project}
 		    <tr>
-		      <td>{project.title}</td>
-					<td>{project.description}</td>
-					<td> 0 </td>
+					<td>{project.project_id}</td>
+		      <td>{project.project_title}</td>
+					<td>{project.project_description}</td>
+					<td>{project.enrollment_count}</td>
+
 		    </tr>
 			{/each}
 		{/if}
@@ -60,23 +63,48 @@
 <script>
 	import 'datatables.net';
 	const fetchOpts = {headers: {}, credentials: 'include'};
+	const _ = require('underscore');
 
 	export default {
 		data () {
 			return {
-					projectList: []
+				masterProjectList: [],
+				projectList: []
 			}
 		},
 		oncreate () {
 			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
 			.then(r => r.json())
 			.then(projectDetails => {
-				this.set({projectList: projectDetails});
-				$('#projects_table').DataTable({
-						"paginate" : true,
-						"autoWidth": false ,
-						"bLengthChange": false,
-						"pagingType": "full_numbers"
+
+				let masterProjectList = [];
+
+				// get all enrollments and count by project id
+				fetch(`/api/auth_req/getEnrollments`, fetchOpts)
+				.then(r => r.json())
+				.then(enrollments => {
+					let enrollment_count = _.groupBy(enrollments, 'project_id')
+					_.each(enrollment_count, (enrollment_data) => {
+
+						let project_data = _.filter(projectDetails, (project) => {
+							if (project.id == enrollment_data[0].project_id ) {
+								return project
+							}
+						});
+						let temp = {}
+						temp['project_id'] = project_data[0].id;
+						temp['project_title'] = project_data[0].title;
+						temp['project_description'] = project_data[0].description;
+						temp['enrollment_count'] = enrollment_data.length;
+						masterProjectList.push(temp)
+					})
+					this.set({masterProjectList: masterProjectList});
+					$('#projects_table').DataTable({
+							"paginate" : true,
+							"autoWidth": false ,
+							"bLengthChange": false,
+							"pagingType": "full_numbers"
+					});
 				})
 			})
 		},

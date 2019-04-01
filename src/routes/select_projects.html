@@ -10,18 +10,21 @@
 <table id="projects_table" class="table">
   <thead class="thead-dark">
     <tr>
+			<th scope="col"> Project Id </th>
       <th scope="col">Project title</th>
 			<th scope="col">Project description</th>
 			<th scope="col">Add project? </th>
     </tr>
   </thead>
   <tbody>
-		{#if projectList.length > 0}
-			{#each projectList as project}
+		{#if masterProjectList.length > 0}
+			{#each masterProjectList as project}
 		    <tr>
+					<td> {project.id} </td>
 		      <td>{project.title}</td>
 					<td>{project.description}</td>
-					<td><button style="width:200px; height:50px;" type="submit" class="btn btn-primary">Add to my projects</button> </td>
+					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="addProjectToUser(project.id)"
+						type="submit" class="btn btn-primary">Add to my projects</button> </td>
 		    </tr>
 			{/each}
 		{/if}
@@ -64,37 +67,107 @@
 
 <script>
 	import 'datatables.net';
-	const fetchOpts = {headers: {}, credentials: 'include'};
+	const _ = require('underscore');
 	export default {
 		data () {
 			return {
-					projectList: []
+					projectList: [],
+					masterProjectList: [],
+					userid: ''
 			}
 		},
 		oncreate () {
-
+			let fetchOpts = {headers: {}, credentials: 'include'};
 			fetch(`/api/auth_req/getUserLevel`,fetchOpts)
 			.then(r => r.json())
 			.then(userDetails => {
 				this.set({'userid': userDetails.csuid})
+
+				fetch(`/api/auth_req/getAllProjects`, fetchOpts)
+				.then(r => r.json())
+				.then(projectDetails => {
+					this.set({projectList: projectDetails});
+					fetchOpts.headers.user_id = this.get().userid;
+					fetch(`/api/auth_req/getEnrollments`, fetchOpts)
+					.then(r => r.json())
+					.then(enrollments => {
+						let masterProjectList = []
+						// match the enrollments with all projects and only display those projects which user is not enrolled in
+						_.each(this.get().projectList, (project) => {
+							// check if this project is in enrollment
+							if(_.where(enrollments, {'project_id': project.id}).length  == 0) {
+								// this project does not exist in enrollments
+								masterProjectList.push(project)
+							}
+						})
+						this.set({masterProjectList: masterProjectList})
+						$('#projects_table').DataTable({
+								"paginate" : true,
+								"autoWidth": false ,
+								"bLengthChange": false,
+								"pagingType": "full_numbers",
+								"columnDefs": [
+									{ "width": "20%", "targets": 1 },
+									{ "width": "20%", "targets": 3 }
+								]
+						})
+					})
+				});
 			});
 
-			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
-			.then(r => r.json())
-			.then(projectDetails => {
-				this.set({projectList: projectDetails});
-				$('#projects_table').DataTable({
-						"paginate" : true,
-						"autoWidth": false ,
-						"bLengthChange": false,
-						"pagingType": "full_numbers",
-						"columnDefs": [
-							{ "width": "20%", "targets": 0 },
-							{ "width": "20%", "targets": 2 }
-						]
-				})
-			})
 
+		},
+		methods: {
+			addProjectToUser: function(projectID) {
+				let fetchOpts = {headers: {}, credentials: 'include'};
+				// on click of button create association
+				let postBody = JSON.stringify({'projectID': projectID, 'userID' : this.get().userid});
+
+				fetchOpts.method = 'post';
+				fetchOpts.headers = {'Content-Type': 'application/json'};
+				fetchOpts.body = postBody;
+
+				fetch('/api/auth_req/addNewEnrollment', fetchOpts)
+				.then(r => r.json())
+				.then(result => {
+					alert("enrollment created - ID : " + result)
+					this.rebuildMasterProjectList();
+				})
+			},
+
+			rebuildMasterProjectList: function() {
+				let fetchOpts = {headers: {}, credentials: 'include'};
+				var oTable = $('#projects_table').dataTable();
+				oTable.fnDestroy();
+				fetchOpts.method = 'get';
+
+				// get all enrollments and rebuild the list of projects to display
+				fetchOpts.headers.user_id = this.get().userid;
+				fetch(`/api/auth_req/getEnrollments`, fetchOpts)
+				.then(r => r.json())
+				.then(enrollments => {
+					let masterProjectList = []
+					// match the enrollments with all projects and only display those projects which user is not enrolled in
+					_.each(this.get().projectList, (project) => {
+						// check if this project is in enrollment
+						if(_.where(enrollments, {'project_id': project.id}).length  == 0) {
+							// this project does not exist in enrollments
+							masterProjectList.push(project)
+						}
+					})
+					this.set({masterProjectList: masterProjectList})
+					$('#projects_table').DataTable({
+							"paginate" : true,
+							"autoWidth": false ,
+							"bLengthChange": false,
+							"pagingType": "full_numbers",
+							"columnDefs": [
+								{ "width": "20%", "targets": 1 },
+								{ "width": "20%", "targets": 3 }
+							]
+					})
+				})
+			}
 		},
 		ondestroy() {
 			var oTable = $('#projects_table').dataTable();

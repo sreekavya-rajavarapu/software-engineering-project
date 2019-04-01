@@ -18,14 +18,4 @@ db.Enrollment = require('../models/enrollment.js')(connection, Sequelize);
 db.Project = require('../models/project.js')(connection, Sequelize);
 db.User = require('../models/user.js')(connection, Sequelize);
 
-
-// student <-->> enrollments
-db.User.enrollment = db.User.hasMany(db.Enrollment);
-db.Enrollment.user = db.Enrollment.belongsTo(db.User);
-
-// project <-->> enrollments
-db.Project.enrollment = db.Project.hasMany(db.Enrollment);
-db.Enrollment.project = db.Enrollment.belongsTo(db.Project);
-
-
 module.exports = db;
