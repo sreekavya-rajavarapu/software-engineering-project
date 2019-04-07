@@ -1,6 +1,6 @@
 <Nav segment={child.segment}/>
 
-<main>
+<main style={child.segment == 'viewProjects' || 'selectProjects' ? "max-width:90em" : ""}>
 	<svelte:component this={child.component} {...child.props}/>
 </main>
 
@@ -12,6 +12,9 @@
 		padding: 2em;
 		margin: 0 auto;
 		box-sizing: border-box;
+	}
+	.extended-width {
+		max-width: 100em;
 	}
 </style>
 

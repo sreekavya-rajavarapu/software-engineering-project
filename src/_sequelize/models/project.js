@@ -5,6 +5,9 @@ module.exports = (connection, DataTypes) => {
     },
     description: {
       type: DataTypes.STRING
+    },
+    composition: {
+      type: DataTypes.STRING
     }
   },
   {

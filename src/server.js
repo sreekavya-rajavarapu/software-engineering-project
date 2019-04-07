@@ -86,10 +86,13 @@ app.all('/api/auth_req/*', (req,res,next) => {
     console.log(new Date() + ` not yet authenticated for: ${req.path}`);
     passport.authenticate('local', function(err, user) {
 			db.User.findOne({ where: {csuid: user}}).then((user) => {
-				req.login({ id: user.csuid, password: user.password },{ session: false }, function(err) {
-						if(err) {return next(err)}
-						next()
-				})
+				if(user) {
+
+					req.login({ id: user.csuid, password: user.password },{ session: false }, function(err) {
+							if(err) {return next(err)}
+							next()
+					})
+				}
 			})
     })(req, res, next)
   }
@@ -111,9 +114,9 @@ app.post('/login',
   passport.authenticate('local', { failureRedirect: '/login' }),
   function(req, res) {
 		if(req.user.type == 'student') {
-			res.redirect('select_projects');
+			res.redirect('selectProjects');
 		} else if (req.user.type == 'admin') {
-			res.redirect('view_projects')
+			res.redirect('viewProjects')
 		}
   });
 

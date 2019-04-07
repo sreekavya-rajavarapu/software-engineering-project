@@ -15,7 +15,7 @@
     "bootstrap": "^4.2.1",
     "compression": "^1.7.1",
     "css-loader": "^2.1.0",
-    "csv-parse": "^4.3.1",
+    "csv-parse": "^4.3.4",
     "datatables": "^1.10.18",
     "datatables.net": "^1.10.19",
     "datatables.net-dt": "^1.10.19",

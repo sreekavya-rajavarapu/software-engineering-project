@@ -1,11 +1,11 @@
 <nav>
 	<ul>
 		{#if userlevel == 'admin'}
-			<li><a class='{segment === "view_projects" ? "selected" : ""}' href='view_projects'> Projects</a></li>
+			<li><a class='{segment === "viewProjects" ? "selected" : ""}' href='viewProjects'> Projects</a></li>
 			<li><a class='{segment === "new_projects" ? "selected" : ""}' href='new_projects' > Add new Project </a></li>
 			<li><a class='{segment === "logout" ? "selected" : ""}' href='logout' > Logout </a></li>
 		{:else}
-			<li><a class='{segment === "select_projects" ? "selected" : ""}' href='select_projects'> Select Projects</a></li>
+			<li><a class='{segment === "selectProjects" ? "selected" : ""}' href='selectProjects'> Select Projects</a></li>
 			<li><a class='{segment === "my_profile" ? "selected" : ""}' href='my_profile'> My Profile </a></li>
 			<li><a class='{segment === "logout" ? "selected" : ""}' href='logout' > Logout </a></li>
 		{/if}

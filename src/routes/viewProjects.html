@@ -8,6 +8,7 @@
 			<th scope="col">Project ID</th>
       <th scope="col">Project title</th>
 			<th scope="col">Project description</th>
+			<th scope="col">Project composition</th>
 			<th scope="col"> Total Enrolled </th>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
 					<td>{project.project_id}</td>
 		      <td>{project.project_title}</td>
 					<td>{project.project_description}</td>
+					<td>{project.composition}</td>
 					<td>{project.enrollment_count}</td>
 
 		    </tr>
@@ -27,6 +29,10 @@
 </table>
 
 <style>
+	main {
+		max-width: 75em !important;
+	}
+
 	h1, figure, p {
 		text-align: center;
 		margin: 0 auto;
@@ -84,6 +90,8 @@
 				.then(r => r.json())
 				.then(enrollments => {
 					let enrollment_count = _.groupBy(enrollments, 'project_id')
+
+
 					_.each(enrollment_count, (enrollment_data) => {
 
 						let project_data = _.filter(projectDetails, (project) => {
@@ -92,12 +100,36 @@
 							}
 						});
 						let temp = {}
-						temp['project_id'] = project_data[0].id;
-						temp['project_title'] = project_data[0].title;
-						temp['project_description'] = project_data[0].description;
-						temp['enrollment_count'] = enrollment_data.length;
-						masterProjectList.push(temp)
+						if(project_data[0]) {
+							temp['project_id'] = project_data[0].id;
+							temp['project_title'] = project_data[0].title;
+							temp['project_description'] = project_data[0].description;
+							temp['enrollment_count'] = enrollment_data.length;
+							temp['composition'] = project_data[0].composition;
+							masterProjectList.push(temp)
+						}
+					});
+
+					// find all projects which have 0 enrollments
+
+					_.each(projectDetails, (project_data) => {
+						console.log(project_data);
+						let data = _.filter(enrollments, (enrollment) => {
+							return enrollment.project_id == project_data.id
+						})
+						console.log(data);
+						if (data.length == 0) {
+							// this project has no enrollment
+							let temp = {}
+							temp['project_id'] = project_data.id;
+							temp['project_title'] = project_data.title;
+							temp['project_description'] = project_data.description;
+							temp['composition'] = project_data.composition;
+							temp['enrollment_count'] = 0;
+							masterProjectList.push(temp)
+						}
 					})
+
 					this.set({masterProjectList: masterProjectList});
 					$('#projects_table').DataTable({
 							"paginate" : true,

@@ -6,14 +6,20 @@
 <br />
 
   <div class="form-group">
-    <label for="exampleFormControlInput1">Project title</label>
+    <label for="title">Project title</label>
     <input type="text" class="form-control" id="project-title" placeholder="">
   </div>
 
   <div class="form-group">
-    <label for="exampleFormControlTextarea1">Project description</label>
+    <label for="description">Project description</label>
     <textarea class="form-control" id="project-description" rows="3"></textarea>
   </div>
+
+	<div class="form-group">
+		<label for="composition">Project composition</label>
+		<textarea class="form-control" id="project-composition" rows="1"></textarea>
+	</div>
+
 
 	<button type="submit" on:click="createProject()" class="btn btn-primary">Add project</button>
 
@@ -23,15 +29,14 @@
 
 <h4> Or upload a csv </h4>
 
-<div action="#" class="dropzone dropzone-box" id=upload>
+<div action="/api/auth_req/file-upload" class="dropzone dropzone-box" id="projectDropzone">
   <div class="fallback"></div>
-  <div class="dz-message" data-dz-message><span><slot></slot></span></div>
+  <div class="dz-message" data-dz-message><span><slot>Drag and drop / Click here to upload a csv</slot></span></div>
 </div>
 
 <script>
 const fetchOpts = {headers: {}, credentials: 'include'};
 let dzOpts = {
-		url: '/api/imports',
 		timeout: 180000,
 		acceptedFiles: '.csv,.zip'
 	};
@@ -40,7 +45,18 @@ export default {
 	oncreate() {
 		var DropZone = require('dropzone');
 		require('dropzone/dist/dropzone.css');
-		this.dropZone = new DropZone(`div#upload`, dzOpts);
+		DropZone.autoDiscover = false;
+		this.dropZone = new DropZone(`#projectDropzone`, dzOpts);
+
+		this.dropZone.on('error', function(file, errorMessage) {
+      alert(`Error uploading file: ${errorMessage}`);
+    });
+
+		this.dropZone.on('success', (file, res) => {
+			console.log(res);
+		// console.log(res);
+		});
+
 	},
 	methods: {
 		createProject: function() {
@@ -48,7 +64,10 @@ export default {
 			// TODO: Validation
 			var title = document.getElementById('project-title').value;
 			var description = document.getElementById('project-description').value;
-			let postBody = JSON.stringify({'title': title, 'description' : description});
+			var composition = document.getElementById('project-composition').value;
+
+			let postBody = JSON.stringify({'title': title, 'description' : description,
+			'composition': composition});
 
 			fetchOpts.method = 'post';
 			fetchOpts.headers = {'Content-Type': 'application/json'};

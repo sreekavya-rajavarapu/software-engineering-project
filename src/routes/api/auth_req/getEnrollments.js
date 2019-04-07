@@ -10,15 +10,17 @@ export function get(req, res, next) {
     user_id = "%";
   }
 
-  db.Enrollment.findAll({where: {user_id: {[db.Sequelize.Op.like] : user_id}}}).then((enrollments) => {
-      _.each(enrollments, (enrollment) => {
-        let temp = {}
-        temp['enrollment_id'] = enrollment.id;
-        temp['enrollment_date'] = enrollment.date_of_enrollment;
-        temp['user_id'] = enrollment.user_id;
-        temp['project_id'] = enrollment.project_id;
-        response.push(temp)
-      });
-      res.json(response)
-  });
+    db.Enrollment.findAll({where: {user_id: {[db.Sequelize.Op.like] : user_id}}}).then((enrollments) => {
+        _.each(enrollments, (enrollment) => {
+          let temp = {}
+          temp['enrollment_id'] = enrollment.id;
+          temp['enrollment_date'] = enrollment.date_of_enrollment;
+          temp['user_id'] = enrollment.user_id;
+          temp['project_id'] = enrollment.project_id;
+          response.push(temp)
+        });
+        res.json(response)
+    });
+
+
 }

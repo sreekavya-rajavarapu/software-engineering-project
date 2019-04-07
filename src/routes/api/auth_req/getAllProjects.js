@@ -11,10 +11,9 @@ export function get(req, res, next) {
         temp['id'] = project.id;
         temp['title'] = project.title;
         temp['description'] = project.description;
+        temp['composition'] = project.composition;
         response.push(temp)
       });
       res.json(response)
-  });
-
-
+    });
 }
