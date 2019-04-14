@@ -2,6 +2,14 @@
 	<title>CSU Enrollment</title>
 </svelte:head>
 
+
+{#if downloadAvailable}
+	<a class="download-link" href="/api/auth_req/download_csv"> <img src="download.png" class="icon-img" /> download </a>
+{:else}
+<button type="button" on:click="downloadcsv()"  class="btn btn-primary" name="button"> Export CSV of enrollments</button>
+{/if}
+
+
 <table id="projects_table" class="table">
   <thead class="thead-dark">
     <tr>
@@ -55,6 +63,15 @@
 		margin: 0 0 1em 0;
 	}
 
+	.download-link{
+		padding:5px;
+		width:100px;
+		height: 100px;
+		margin-top:10px;
+		margin-bottom: 10px;
+		display: block;
+}
+
 	p {
 		margin: 1em auto;
 	}
@@ -70,11 +87,14 @@
 	import 'datatables.net';
 	const fetchOpts = {headers: {}, credentials: 'include'};
 	const _ = require('underscore');
-
+	const { Parser } = require('json2csv');
+	var moment  = require('moment-timezone');
 	export default {
 		data () {
 			return {
 				masterProjectList: [],
+				allProjects: [],
+				allEnrollments: [],
 				projectList: []
 			}
 		},
@@ -82,13 +102,14 @@
 			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
 			.then(r => r.json())
 			.then(projectDetails => {
-
+				this.set({allProjects: projectDetails});
 				let masterProjectList = [];
 
 				// get all enrollments and count by project id
 				fetch(`/api/auth_req/getEnrollments`, fetchOpts)
 				.then(r => r.json())
 				.then(enrollments => {
+					this.set({allEnrollments: enrollments});
 					let enrollment_count = _.groupBy(enrollments, 'project_id')
 
 
@@ -113,11 +134,11 @@
 					// find all projects which have 0 enrollments
 
 					_.each(projectDetails, (project_data) => {
-						console.log(project_data);
+
 						let data = _.filter(enrollments, (enrollment) => {
 							return enrollment.project_id == project_data.id
 						})
-						console.log(data);
+
 						if (data.length == 0) {
 							// this project has no enrollment
 							let temp = {}
@@ -139,6 +160,34 @@
 					});
 				})
 			})
+		},
+		methods: {
+			downloadcsv: function() {
+				// get all enrollments
+				let csv_data = [];
+				_.each(this.get().allEnrollments, (enrollment) => {
+					let temp = {};
+					let project_details = _.find(this.get().allProjects, (project) => {
+						return project.id == enrollment.project_id;
+					});
+					temp['enrollment_id'] = enrollment.enrollment_id;
+					temp['date_of_enrollment'] = moment.utc(enrollment.enrollment_date).tz("America/New_York").format('YYYY-MM-DD HH:mm');
+					temp['user_csu_id'] = enrollment.user_id;
+					temp['project_title'] = project_details.title;
+					temp['project_description'] = project_details.description;
+					temp['project_composition'] = project_details.composition;
+					csv_data.push(temp);
+				})
+				const parser = new Parser();
+ 				const csv = parser.parse(csv_data);
+				fetch('/api/auth_req/download_csv', {
+				method: 'post',
+				credentials: 'include',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(csv_data)
+			})
+			this.set({downloadAvailable: true})
+			}
 		},
 		ondestroy() {
 			var oTable = $('#projects_table').dataTable();
