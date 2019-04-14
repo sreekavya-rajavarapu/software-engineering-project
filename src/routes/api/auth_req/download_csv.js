@@ -9,7 +9,6 @@ export function post(req,res,next) {
   'user_csu_id', 'project_title', 'project_description', 'project_composition' ];
   const opts = { fields };
   let jsonTableData = req.body;
-  console.log(jsonTableData);
   let exportDir = `${process.cwd()}${sep}exports${sep}datatables-export`;
 
   if (!fs.existsSync(exportDir)){

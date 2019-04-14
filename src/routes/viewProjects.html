@@ -4,7 +4,7 @@
 
 
 {#if downloadAvailable}
-	<a class="download-link" href="/api/auth_req/download_csv"> <img src="download.png" class="icon-img" /> download </a>
+	<a class="download-link" href="/api/auth_req/download_csv"> download </a>
 {:else}
 <button type="button" on:click="downloadcsv()"  class="btn btn-primary" name="button"> Export CSV of enrollments</button>
 {/if}
@@ -65,11 +65,18 @@
 
 	.download-link{
 		padding:5px;
-		width:100px;
-		height: 100px;
+		width: 80px;
 		margin-top:10px;
 		margin-bottom: 10px;
 		display: block;
+		font: bold 11px Arial;
+	  text-decoration: none;
+	  background-color: #EEEEEE;
+	  color: #333333;
+	  border-top: 1px solid #CCCCCC;
+	  border-right: 1px solid #333333;
+	  border-bottom: 1px solid #333333;
+	  border-left: 1px solid #CCCCCC;
 }
 
 	p {
