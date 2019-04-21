@@ -102,10 +102,18 @@
 				masterProjectList: [],
 				allProjects: [],
 				allEnrollments: [],
-				projectList: []
+				projectList: [],
+				allUsers: []
 			}
 		},
 		oncreate () {
+
+			fetch(`/api/auth_req/getAllUsers`, fetchOpts)
+			.then(r => r.json())
+			.then(userDetails => {
+				this.set({allUsers: userDetails})
+			});
+
 			fetch(`/api/auth_req/getAllProjects`, fetchOpts)
 			.then(r => r.json())
 			.then(projectDetails => {
@@ -172,28 +180,64 @@
 			downloadcsv: function() {
 				// get all enrollments
 				let csv_data = [];
-				_.each(this.get().allEnrollments, (enrollment) => {
-					let temp = {};
-					let project_details = _.find(this.get().allProjects, (project) => {
-						return project.id == enrollment.project_id;
-					});
-					temp['enrollment_id'] = enrollment.enrollment_id;
-					temp['date_of_enrollment'] = moment.utc(enrollment.enrollment_date).tz("America/New_York").format('YYYY-MM-DD HH:mm');
-					temp['user_csu_id'] = enrollment.user_id;
-					temp['project_title'] = project_details.title;
-					temp['project_description'] = project_details.description;
-					temp['project_composition'] = project_details.composition;
-					csv_data.push(temp);
+				let project_list = []
+				let user_enrollment_data = {}
+
+
+				_.each(this.get().allProjects, (project) => {
+					project_list.push(project.title)
 				})
-				const parser = new Parser();
- 				const csv = parser.parse(csv_data);
+				csv_data.push(project_list)
+
+				_.each(this.get().allUsers, (user) => {
+					// for each user create a row = [ x, x, x ...]  for each project
+					let enrollments = _.filter(this.get().allEnrollments, (enrollment) => {
+						return enrollment.user_id == user.csuid
+					})
+					user_enrollment_data[user.csuid] = enrollments
+				})
+
+				_.each(this.get().allUsers, (user) => {
+					let temp = {}
+					temp['_user'] = user.csuid.toString();
+					_.each(this.get().allProjects, (project) => {
+						//check if user has this project
+						let enrolled = _.filter(user_enrollment_data[user.csuid], (enrollment) => {
+							return enrollment.project_id == project.id;
+						})
+						if (enrolled.length > 0) {
+							temp[project.title] = "x"
+						} else {
+							temp[project.title] = " "
+						}
+					})
+					csv_data.push(temp)
+				})
+
+				console.log(csv_data);
+
 				fetch('/api/auth_req/download_csv', {
-				method: 'post',
-				credentials: 'include',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(csv_data)
-			})
-			this.set({downloadAvailable: true})
+					method: 'post',
+					credentials: 'include',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(csv_data)
+				})
+				this.set({downloadAvailable: true})
+
+			// 	_.each(this.get().allEnrollments, (enrollment) => {
+			// 		let temp = {};
+			// 		let project_details = _.find(this.get().allProjects, (project) => {
+			// 			return project.id == enrollment.project_id;
+			// 		});
+			//
+			// 		temp['user_csu_id'] = enrollment.user_id;
+			// 		temp['project_title'] = project_details.title;
+			//
+			// 		csv_data.push(temp);
+			// 	})
+			// 	const parser = new Parser();
+ 			// 	const csv = parser.parse(csv_data);
+
 			}
 		},
 		ondestroy() {

@@ -5,18 +5,21 @@ const json2csv = require('json2csv').parse;
 
 export function post(req,res,next) {
   // these are the field names which needs to be exported on click
-  const fields = ['enrollment_id', 'date_of_enrollment',
-  'user_csu_id', 'project_title', 'project_description', 'project_composition' ];
-  const opts = { fields };
+
+
   let jsonTableData = req.body;
   let exportDir = `${process.cwd()}${sep}exports${sep}datatables-export`;
 
+  const fields  = jsonTableData.shift();
+  const opts = { fields };
   if (!fs.existsSync(exportDir)){
     console.log("Created Export Directory")
     fs.ensureDirSync(exportDir);
   }
+
   try {
-  const csvData = json2csv(jsonTableData, opts);
+  const csvData = json2csv(jsonTableData);
+
   fs.writeFile(`${exportDir}${sep}tempDatatablesExport.csv`, csvData, {spaces:4, EOL:'\n'}, function (err) {
     if (err) {
       console.log('Some error occured - file either not saved or corrupted file saved.' + err);
