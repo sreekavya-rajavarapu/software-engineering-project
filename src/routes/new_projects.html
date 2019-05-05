@@ -5,6 +5,11 @@
 <h4> Enter the project details you want to add </h4>
 <br />
 
+	<div class="form-group">
+		<label for="project_id">Project ID</label>
+		<input type="text" class="form-control" id="project-id" placeholder="">
+	</div>
+
   <div class="form-group">
     <label for="title">Project title</label>
     <input type="text" class="form-control" id="project-title" placeholder="">
@@ -62,11 +67,13 @@ export default {
 		createProject: function() {
 			// add project to database
 			// TODO: Validation
+			var project_id = document.getElementById('project-id').value;
 			var title = document.getElementById('project-title').value;
 			var description = document.getElementById('project-description').value;
 			var composition = document.getElementById('project-composition').value;
 
-			let postBody = JSON.stringify({'title': title, 'description' : description,
+			let postBody = JSON.stringify({'project_id': project_id,
+			'title': title, 'description' : description,
 			'composition': composition});
 
 			fetchOpts.method = 'post';

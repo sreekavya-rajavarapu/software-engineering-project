@@ -20,10 +20,10 @@
 		{#if masterProjectList.length > 0}
 			{#each masterProjectList as project}
 		    <tr>
-					<td> {project.id} </td>
+					<td> {project.project_id} </td>
 		      <td>{project.title}</td>
 					<td>{project.description}</td>
-					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="addProjectToUser(project.id)"
+					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="addProjectToUser(project.project_id)"
 						type="submit" class="btn btn-primary">Add to my projects</button> </td>
 		    </tr>
 			{/each}
@@ -95,7 +95,7 @@
 						// match the enrollments with all projects and only display those projects which user is not enrolled in
 						_.each(this.get().projectList, (project) => {
 							// check if this project is in enrollment
-							if(_.where(enrollments, {'project_id': project.id}).length  == 0) {
+							if(_.where(enrollments, {'project_id': project.project_id}).length  == 0) {
 								// this project does not exist in enrollments
 								masterProjectList.push(project)
 							}
@@ -150,7 +150,7 @@
 					// match the enrollments with all projects and only display those projects which user is not enrolled in
 					_.each(this.get().projectList, (project) => {
 						// check if this project is in enrollment
-						if(_.where(enrollments, {'project_id': project.id}).length  == 0) {
+						if(_.where(enrollments, {'project_id': project.project_id}).length  == 0) {
 							// this project does not exist in enrollments
 							masterProjectList.push(project)
 						}

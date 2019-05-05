@@ -8,7 +8,7 @@ export function get(req, res, next) {
   db.Project.findAll().then((projects) => {
       _.each(projects, (project) => {
         let temp = {}
-        temp['id'] = project.id;
+        temp['project_id'] = project.project_id;
         temp['title'] = project.title;
         temp['description'] = project.description;
         temp['composition'] = project.composition;

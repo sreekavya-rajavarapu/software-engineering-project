@@ -21,11 +21,14 @@ export function post(req, res, next) {
     let record
 
     while (record = parser.read()) {
+      console.log(record);
       let temp = {
+        project_id: record['Project ID'],
         title: record['Project Title'],
         description: record['Project Description'],
         composition: record['Project Composition']
       }
+      console.log(temp);
       create_rows.push(temp);
     }
   });

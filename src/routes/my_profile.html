@@ -17,7 +17,7 @@
 <br />
 <hr />
 <!-- Show the list of projects this user has enrolled in -->
-<h2 style="color:grey"> Your enrollments </h2>
+<h2 style="color:grey"> Your selections </h2>
 
 <table id="projects_table" class="table">
   <thead class="thead-dark">
@@ -26,7 +26,7 @@
       <th scope="col">Project title</th>
 			<th scope="col">Project description</th>
 			<th scope="col">Enrolled on</th>
-			<th scope="col"> Delete enrollment </th>
+			<th scope="col"> Delete selection </th>
     </tr>
   </thead>
   <tbody>
@@ -38,7 +38,7 @@
 					<td>{project.project_description}</td>
 					<td>{project.date_of_enrollment}</td>
 					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="deleteEnrollment(project.project_id)"
-						type="submit" class="btn btn-danger">Delete enrollment</button> </td>
+						type="submit" class="btn btn-danger">Delete selection</button> </td>
 		    </tr>
 			{/each}
 		{/if}
@@ -80,13 +80,13 @@
 						// match the enrollments with all projects and only display those projects which user is not enrolled in
 						_.each(this.get().projectList, (project) => {
 							// check if this project is in enrollment
-							let enrollment = _.where(enrollments, {'project_id': project.id})
+							let enrollment = _.where(enrollments, {'project_id': project.project_id})
 
 							if (enrollment.length > 0 ){
 								let temp = {}
 								temp['enrollment_id'] = enrollment[0].id;
 								temp['date_of_enrollment'] = enrollment[0].enrollment_date;
-								temp['project_id'] = project.id;
+								temp['project_id'] = project.project_id;
 								temp['project_title'] = project.title;
 								temp['project_description'] = project.description;
 								masterProjectList.push(temp)
@@ -114,7 +114,7 @@
 				fetch(`/api/auth_req/deleteEnrollment`, fetchOpts)
 				.then(r => r.json())
 				.then((result) => {
-					alert("Project deleted from your enrollment successfully")
+					alert("Project deleted from your selection successfully")
 					this.rebuildMasterProjectList();
 				})
 			},
@@ -134,13 +134,13 @@
 					// match the enrollments with all projects and only display those projects which user is not enrolled in
 					_.each(this.get().projectList, (project) => {
 						// check if this project is in enrollment
-						let enrollment = _.where(enrollments, {'project_id': project.id})
+						let enrollment = _.where(enrollments, {'project_id': project.project_id})
 
 						if (enrollment.length > 0 ){
 							let temp = {}
 							temp['enrollment_id'] = enrollment[0].id;
 							temp['date_of_enrollment'] = enrollment[0].enrollment_date;
-							temp['project_id'] = project.id;
+							temp['project_id'] = project.project_id;
 							temp['project_title'] = project.title;
 							temp['project_description'] = project.description;
 							masterProjectList.push(temp)

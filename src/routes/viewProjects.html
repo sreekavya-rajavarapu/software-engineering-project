@@ -131,13 +131,13 @@
 					_.each(enrollment_count, (enrollment_data) => {
 
 						let project_data = _.filter(projectDetails, (project) => {
-							if (project.id == enrollment_data[0].project_id ) {
+							if (project.project_id == enrollment_data[0].project_id ) {
 								return project
 							}
 						});
 						let temp = {}
 						if(project_data[0]) {
-							temp['project_id'] = project_data[0].id;
+							temp['project_id'] = project_data[0].project_id;
 							temp['project_title'] = project_data[0].title;
 							temp['project_description'] = project_data[0].description;
 							temp['enrollment_count'] = enrollment_data.length;
@@ -151,13 +151,13 @@
 					_.each(projectDetails, (project_data) => {
 
 						let data = _.filter(enrollments, (enrollment) => {
-							return enrollment.project_id == project_data.id
+							return enrollment.project_id == project_data.project_id
 						})
 
 						if (data.length == 0) {
 							// this project has no enrollment
 							let temp = {}
-							temp['project_id'] = project_data.id;
+							temp['project_id'] = project_data.project_id;
 							temp['project_title'] = project_data.title;
 							temp['project_description'] = project_data.description;
 							temp['composition'] = project_data.composition;
@@ -185,7 +185,7 @@
 
 
 				_.each(this.get().allProjects, (project) => {
-					project_list.push(project.title)
+					project_list.push(project.project_id)
 				})
 				csv_data.push(project_list)
 
@@ -199,22 +199,28 @@
 
 				_.each(this.get().allUsers, (user) => {
 					let temp = {}
+
 					temp['_user'] = user.csuid.toString();
+					temp['_name'] = user.fname.toString() + user.lname.toString();
+					if (user.major_1 != "" || user.major_1 != undefined) {
+						temp['_major'] = user.major_1.toString();
+					} else {
+						temp['_major'] = user.major_2.toString();
+					}
+
 					_.each(this.get().allProjects, (project) => {
 						//check if user has this project
 						let enrolled = _.filter(user_enrollment_data[user.csuid], (enrollment) => {
-							return enrollment.project_id == project.id;
+							return enrollment.project_id == project.project_id;
 						})
 						if (enrolled.length > 0) {
-							temp[project.title] = "x"
+							temp['ID-' + project.project_id] = "x"
 						} else {
-							temp[project.title] = " "
+							temp['ID-' + project.project_id] = " "
 						}
 					})
 					csv_data.push(temp)
 				})
-
-				console.log(csv_data);
 
 				fetch('/api/auth_req/download_csv', {
 					method: 'post',

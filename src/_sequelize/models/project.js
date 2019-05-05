@@ -1,5 +1,8 @@
 module.exports = (connection, DataTypes) => {
   const Project = connection.define('projects', {
+    project_id: {
+      type: DataTypes.INTEGER
+    },
     title: {
       type: DataTypes.STRING
     },

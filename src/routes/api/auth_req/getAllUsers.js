@@ -11,6 +11,8 @@ export function get(req, res, next) {
         temp['csuid'] = user.csuid;
         temp['fname'] = user.fname;
         temp['lname'] = user.lname;
+        temp['major_1'] = user.major_1;
+        temp['major_2'] = user.major_2;
         response.push(temp)
       });
       res.json(response)
