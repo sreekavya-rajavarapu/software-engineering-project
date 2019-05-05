@@ -42,7 +42,7 @@ passport.use(new Strategy(
 				}
 			} else {
 				console.log("Invalid user name / password");
-				return done(null, false);
+				return done(null, false, { message : 'invalid e-mail address or password' });
 			}
 		})
   }
@@ -70,7 +70,7 @@ app.all('/', function(req, res, next) {
 
 
 app.post('/api/addNewUser', (req, res,next) => {
-	passport.authenticate('local', function(err, user) {
+	passport.authenticate('local', {failureFlash: true}, function(err, user) {
 		req.login({ id: 'admin', password: 'admin' },{ session: false }, function(err) {
 				if(err) {return next(err)}
 				next()
@@ -84,7 +84,7 @@ app.all('/api/auth_req/*', (req,res,next) => {
     next();
   } else {
     console.log(new Date() + ` not yet authenticated for: ${req.path}`);
-    passport.authenticate('local', function(err, user) {
+    passport.authenticate('local', {failureFlash: true}, function(err, user) {
 			db.User.findOne({ where: {csuid: user}}).then((user) => {
 				if(user) {
 
@@ -111,7 +111,7 @@ app.get('/new_user', (req,res) => {
 
 // after passport serializes user object
 app.post('/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
+  passport.authenticate('local', { failureRedirect: '/login',  failureFlash: true }),
   function(req, res) {
 		if(req.user.type == 'student') {
 			res.redirect('selectProjects');

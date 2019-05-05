@@ -67,6 +67,13 @@
     </div>
 </section>
 
+<hr>
+
+<% Object.keys(flash).forEach(function(type) { %>
+  <% flash[type].forEach(function(str) { %>
+    <%- type %>: <%- str %>
+  <% }); %>
+<% }); %>
 
 </html>
 <style>
@@ -133,7 +140,7 @@
           alert("Student added successfully");
           window.location.href = "login";
         } else {
-          
+
         }
       }
 
