@@ -36,12 +36,14 @@ export function post(req, res, next) {
   // When we are done, test that the parsed output matched what expected
   parser.on('finish', function(){
     // output will be a array of arrays with first row as header
-    db.Project.bulkCreate(create_rows).then((rows) => {
-      _.each(rows, (row) => {
-        created_ids.push(row.id)
-      });
-      console.log(new Date() + " finished parsing csv");
-      res.status(200).json(created_ids);
+    db.Project.sync().then(() => {
+      db.Project.bulkCreate(create_rows).then((rows) => {
+        _.each(rows, (row) => {
+          created_ids.push(row.id)
+        });
+        console.log(new Date() + " finished parsing csv");
+        res.status(200).json(created_ids);
+      })
     })
   });
 

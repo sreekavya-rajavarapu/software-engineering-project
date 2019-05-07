@@ -9,13 +9,14 @@ export function post(req, res, next) {
   });
   console.log(nDate);
   db.Enrollment.sync().then(() => {
-    db.User.findOne({where: {csuid: userID}}).then((user) => {
-
-      db.Project.findOne({where: {id: projectID}}).then((project) => {
-        let insertRow = _.extend({date_of_enrollment: nDate},{user_id: user.csuid}, {project_id: project.project_id})
-        console.log(insertRow);
-        db.Enrollment.create(insertRow).then((enrollment) => {
-          res.json(enrollment.id);
+    db.User.sync().then(() => {
+      db.User.findOne({where: {csuid: userID}}).then((user) => {
+        db.Project.findOne({where: {id: projectID}}).then((project) => {
+          let insertRow = _.extend({date_of_enrollment: nDate},{user_id: user.csuid}, {project_id: project.project_id})
+          console.log(insertRow);
+          db.Enrollment.create(insertRow).then((enrollment) => {
+            res.json(enrollment.id);
+          })
         })
       })
     })
