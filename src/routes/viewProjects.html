@@ -18,6 +18,9 @@
 			<th scope="col">Project description</th>
 			<th scope="col">Project composition</th>
 			<th scope="col"> Total Enrolled </th>
+			<th scope="col">
+				Delete / Modify Project
+				</th>"
     </tr>
   </thead>
   <tbody>
@@ -29,7 +32,10 @@
 					<td>{project.project_description}</td>
 					<td>{project.composition}</td>
 					<td>{project.enrollment_count}</td>
-
+					<td><button style="width:150px; height:30px; margin-bottom: 5px; text-align: center; font-size:12px;" on:click="deleteProject(project.project_id)"
+						type="submit" class="btn btn-danger">Delete project</button> <br  />
+					<button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="modifyProject(project.project_id)"
+					type="button" class="btn btn-warning">Modify project</button> </td>
 		    </tr>
 			{/each}
 		{/if}
@@ -244,7 +250,59 @@
 			// 	const parser = new Parser();
  			// 	const csv = parser.parse(csv_data);
 
+		},
+
+		deleteProject: function(project_id) {
+			let user_confirm = confirm('Do you want to delete project with ID ' + project_id + ' and all its enrollments?')
+			if (user_confirm) {
+				fetch('/api/auth_req/deleteProject', {
+					method: 'delete',
+					credentials: 'include',
+					headers: {'Content-Type': 'application/json', project_id: project_id}
+				}).then((deleted) => {
+					alert("deleted successfully");
+					window.location.reload();
+				})
 			}
+		},
+
+		modifyProject: function(project_id) {
+			let user_confirm = confirm('Do you want tp modify the project with ID ' + project_id +  ' ?')
+			if (user_confirm) {
+				let project_details = _.filter(this.get().masterProjectList, function(project) {
+					return project.project_id == project_id;
+				})
+				console.log(project_details);
+				if (project_details.length > 0) {
+					// get title description and composition
+					var title = prompt("Enter new title for project (leave blank to cancel modification)", project_details[0].project_title);
+					if (title == "" || title == null) {
+						alert("modification cancelled")
+						return
+					}
+					var description = prompt("Enter new description for project (leave blank to cancel modification)", project_details[0].project_description);
+					if (description == "" || description == null) {
+						alert("modification cancelled")
+						return
+					}
+					var composition = prompt("Enter new composition for project (leave blank to cancel modification)", project_details[0].composition);
+					if (composition == "" || composition == null) {
+						alert("modification cancelled")
+						return
+					}
+					fetch('/api/auth_req/modifyProject', {
+						method: 'post',
+						credentials: 'include',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify({project_id: project_id, title: title, description: description, composition: composition})
+					}).then((modified) => {
+						console.log(modified);
+						alert("modified successfully")
+						window.location.reload()
+					})
+				}
+			}
+		}
 		},
 		ondestroy() {
 			var oTable = $('#projects_table').dataTable();
