@@ -1,0 +1,74 @@
+<svelte:head>
+	<title>Manage users</title>
+</svelte:head>
+
+<!-- Show the list of user in the system-->
+<h2 style="color:grey"> Users </h2>
+
+<table id="projects_table" class="table">
+  <thead class="thead-dark">
+    <tr>
+			<th scope="col"> User Id </th>
+      <th scope="col"> First name </th>
+			<th scope="col"> Last name </th>
+			<th scope="col"> Major 1</th>
+      <th scope="col"> Major 2 </th>
+      <th scope="col"> Delete user? </th>
+    </tr>
+  </thead>
+  <tbody>
+		{#if masteruserList.length > 0}
+			{#each masteruserList as user}
+		    <tr>
+					<td> {user.csuid} </td>
+		      <td>{user.fname}</td>
+					<td>{user.lname}</td>
+          <td>{user.major_1}</td>
+          <td>{user.major_2}</td>
+					<td><button style="width:150px; height:30px; text-align: center; font-size:12px;" on:click="deleteUser(user.csuid)"
+						type="submit" class="btn btn-danger">Delete user</button> </td>
+		    </tr>
+			{/each}
+		{/if}
+  </tbody>
+</table>
+
+<script>
+	import 'datatables.net';
+	const _ = require('underscore');
+	let fetchOpts = {headers: {}, credentials: 'include'};
+	export default {
+		data() {
+			return{
+				projectList: [],
+				masteruserList: []
+			}
+		},
+		oncreate () {
+      this.getAllUsers();
+		},
+		methods: {
+			deleteUser: function(csuid) {
+				let fetchOpts = {headers: {}, credentials: 'include'};
+				fetchOpts.method = 'delete';
+				fetchOpts.headers.csuid = csuid;
+				// remove this user
+				fetch(`/api/auth_req/deleteUser`, fetchOpts)
+				.then(r => r.json())
+				.then((result) => {
+					alert("User removed from database successfully")
+					this.getAllUsers();
+				})
+      },
+      getAllUsers: function() {
+        let fetchOpts = {headers: {}, credentials: 'include'};
+        fetch(`/api/auth_req/getAllUsers`,fetchOpts)
+        .then(r => r.json())
+        .then((userDetails) => {
+          console.log(userDetails);
+          this.set({ masteruserList: userDetails });
+        })
+      }
+		}
+	}
+</script>

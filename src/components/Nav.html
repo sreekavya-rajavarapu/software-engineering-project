@@ -2,7 +2,8 @@
 	<ul>
 		{#if userlevel == 'admin'}
 			<li><a class='{segment === "viewProjects" ? "selected" : ""}' href='viewProjects'> Projects</a></li>
-			<li><a class='{segment === "new_projects" ? "selected" : ""}' href='new_projects' > Add new Project </a></li>
+      <li><a class='{segment === "new_projects" ? "selected" : ""}' href='new_projects' > Add new Project </a></li>
+      <li><a class='{segment === "manage_users" ? "selected" : ""}' href='manage_users'> Manage users </a></li>
 			<li><a class='{segment === "logout" ? "selected" : ""}' href='logout' > Logout </a></li>
 		{:else}
 			<li><a class='{segment === "selectProjects" ? "selected" : ""}' href='selectProjects'> Select Projects</a></li>
