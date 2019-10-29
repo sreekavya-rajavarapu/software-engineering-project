@@ -37,7 +37,7 @@
     "polka": "^0.4.0",
     "popper.js": "^1.14.7",
     "sass-loader": "^7.1.0",
-    "sequelize": "^5.1.0",
+    "sequelize": "^5.15.1",
     "session-memory-store": "^0.2.2",
     "sirv": "^0.2.0",
     "sqlite3": "^4.0.6",
